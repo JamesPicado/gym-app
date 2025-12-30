@@ -22,6 +22,8 @@ npm install
 npm start
 ```
 
+> Si necesitas limpiar la caché de Metro/Expo, inicia con `npx expo start -c` (o `npm start -- -c`) para forzar un arranque limpio.
+
 3) Desde el menú de Expo CLI abre la app en un dispositivo físico (Expo Go), un emulador Android (`npm run android`), o un simulador iOS (`npm run ios` en macOS).
 
 ## Scripts disponibles
