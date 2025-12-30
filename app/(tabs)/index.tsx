@@ -1,98 +1,272 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  RefreshControl,
+  SafeAreaView,
+  View,
+  Text,
+} from "react-native";
+import { useState } from "react";
+import { useRouter } from "expo-router";
+import { useTheme } from "../../src/theme/useTheme";
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+// Cards existentes
+import { HomeRoutineCard } from "../../src/components/HomeRoutineCard";
+import { HomeProgressCard } from "../../src/components/HomeProgressCard";
+import { HomeActivityCard } from "../../src/components/HomeActivityCard";
+
+// Acciones rápidas
+import { HomeQuickActions } from "../../src/components/HomeQuickActions";
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const { colors } = useTheme();
+  const router = useRouter();
+  const [refreshing, setRefreshing] = useState(false);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setTimeout(() => setRefreshing(false), 1000);
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {/* ───────── HEADER ───────── */}
+        <View style={styles.header}>
+          <View>
+            <Text style={[styles.greeting, { color: colors.text }]}>
+              Hola, James 💪
+            </Text>
+            <Text style={styles.date}>
+              {new Date().toLocaleDateString("es-CR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
+            </Text>
+          </View>
+
+          <View style={styles.streak}>
+            <Text style={styles.streakValue}>🔥 5</Text>
+            <Text style={styles.streakLabel}>días seguidos</Text>
+          </View>
+        </View>
+
+        {/* ───────── STATS COMPACTOS ───────── */}
+        <View style={styles.statsRow}>
+          <Stat label="Sesiones" value="12" color={colors.text} />
+          <Stat label="Minutos" value="340" color={colors.text} />
+          <Stat label="Calorías" value="2.1k" color={colors.text} />
+        </View>
+
+        {/* ───────── RUTINA DE HOY ───────── */}
+        <HomeRoutineCard />
+
+        {/* ───────── ACCIONES RÁPIDAS ───────── */}
+        <HomeQuickActions />
+
+        {/* ───────── PROGRESO ───────── */}
+        <HomeProgressCard />
+
+        {/* ───────── ACTIVIDAD RECIENTE ───────── */}
+        <HomeActivityCard />
+
+        <View style={[styles.activityList, { backgroundColor: colors.card }]}>
+          <Text style={[styles.activityItem, { color: colors.text }]}>
+            ✔ Rutina Piernas completada
+          </Text>
+          <Text style={[styles.activityItem, { color: colors.text }]}>
+            ✔ Peso registrado
+          </Text>
+          <Text style={[styles.activityItem, { color: colors.text }]}>
+            ✔ Nuevo récord en press
+          </Text>
+        </View>
+
+        {/* ───────── HISTORIAL ───────── */}
+        <View style={styles.historyWrapper}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Historial
+          </Text>
+
+          <Text style={[styles.sectionSubtitle, { color: colors.muted }]}>
+            Revisa tus entrenamientos anteriores
+          </Text>
+
+          <View style={[styles.historyCard, { backgroundColor: colors.card }]}>
+            <Text style={[styles.historyText, { color: colors.text }]}>
+              📅 Ver historial de entrenamientos
+            </Text>
+
+            <Text
+              style={[
+                styles.historyDescription,
+                { color: colors.muted },
+              ]}
+            >
+              Consulta tus rutinas completadas y tu progreso por fecha.
+            </Text>
+
+            <View style={styles.historyButtonRow}>
+              <Text
+                style={[
+                  styles.historyButton,
+                  { color: colors.primary },
+                ]}
+                onPress={() => router.push("/history")}
+              >
+                Ver historial →
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* ───────── MOTIVACIÓN ───────── */}
+        <View style={[styles.motivation, { backgroundColor: colors.card }]}>
+          <Text style={[styles.motivationText, { color: colors.text }]}>
+            “La constancia vence a la motivación.”
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
+/* ───────────────── COMPONENTE STAT ───────────────── */
+
+function Stat({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
+  return (
+    <View style={styles.stat}>
+      <Text style={[styles.statValue, { color }]}>{value}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+}
+
+/* ───────────────── ESTILOS ───────────────── */
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  content: {
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 32,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+
+  /* Header */
+  header: {
+    marginBottom: 16,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  greeting: {
+    fontSize: 26,
+    fontWeight: "700",
+  },
+  date: {
+    fontSize: 13,
+    color: "#9ca3af",
+    marginTop: 4,
+  },
+  streak: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+  },
+  streakValue: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  streakLabel: {
+    fontSize: 13,
+    color: "#9ca3af",
+  },
+
+  /* Stats */
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  stat: {
+    alignItems: "center",
+    flex: 1,
+  },
+  statValue: {
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#9ca3af",
+  },
+
+  /* Actividad */
+  activityList: {
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 20,
+  },
+  activityItem: {
+    fontSize: 14,
+    marginBottom: 6,
+    fontWeight: "500",
+  },
+
+  /* Historial */
+  historyWrapper: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 13,
+    marginBottom: 10,
+  },
+  historyCard: {
+    borderRadius: 14,
+    padding: 16,
+  },
+  historyText: {
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+  historyDescription: {
+    fontSize: 13,
+    marginBottom: 12,
+  },
+  historyButtonRow: {
+    alignItems: "flex-end",
+  },
+  historyButton: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
+
+  /* Motivación */
+  motivation: {
+    borderRadius: 14,
+    padding: 16,
+  },
+  motivationText: {
+    fontSize: 14,
+    fontStyle: "italic",
+    textAlign: "center",
+    opacity: 0.85,
   },
 });
